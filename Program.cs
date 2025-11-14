@@ -49,3 +49,9 @@ app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
 });
 
 app.Run();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApiDocument(config => {
+    config.DocumentName = "TodoAPI";
+    config.Title = "TodoAPI v1";
+    config.Version = "v1";
+});

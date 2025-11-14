@@ -1,8 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "N5Mj4sj+Hx4=",
+  "dgSpecHash": "d4R+yK0/1ps=",
   "success": true,
   "projectFilePath": "C:\\Users\\hp\\Documents\\EAD\\TodoApi\\TodoApi.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.diagnostics.entityframeworkcore\\10.0.0\\microsoft.aspnetcore.diagnostics.entityframeworkcore.10.0.0.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\microsoft.entityframeworkcore\\10.0.0\\microsoft.entityframeworkcore.10.0.0.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\10.0.0\\microsoft.entityframeworkcore.abstractions.10.0.0.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\10.0.0\\microsoft.entityframeworkcore.analyzers.10.0.0.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\microsoft.entityframeworkcore.inmemory\\10.0.0\\microsoft.entityframeworkcore.inmemory.10.0.0.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\10.0.0\\microsoft.entityframeworkcore.relational.10.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

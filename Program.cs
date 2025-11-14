@@ -1,57 +1,76 @@
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+// Register the repository as a service
+builder.Services.AddSingleton<TodoRepository>();
 
 var app = builder.Build();
 
-app.MapGet("/todoitems", async (TodoDb db) =>
-    await db.Todos.ToListAsync());
+// ----------- GROUP ROUTES --------------
+var todoItems = app.MapGroup("/todoitems");
 
-app.MapGet("/todoitems/complete", async (TodoDb db) =>
-    await db.Todos.Where(t => t.IsComplete).ToListAsync());
+// GET ALL
+todoItems.MapGet("/", GetAllTodos);
 
-app.MapGet("/todoitems/{id}", async (int id, TodoDb db) =>
-    await db.Todos.FindAsync(id)
-        is Todo todo
-            ? Results.Ok(todo)
-            : Results.NotFound());
+// GET BY ID
+todoItems.MapGet("/{id}", GetTodoById);
 
-app.MapPost("/todoitems", async (Todo todo, TodoDb db) =>
-{
-    db.Todos.Add(todo);
-    await db.SaveChangesAsync();
-    return Results.Created($"/todoitems/{todo.Id}", todo);
-});
+// POST
+todoItems.MapPost("/", CreateTodo);
 
-app.MapPut("/todoitems/{id}", async (int id, Todo inputTodo, TodoDb db) =>
-{
-    var todo = await db.Todos.FindAsync(id);
-    if (todo is null) return Results.NotFound();
+// PUT
+todoItems.MapPut("/{id}", UpdateTodo);
 
-    todo.Name = inputTodo.Name;
-    todo.IsComplete = inputTodo.IsComplete;
-    await db.SaveChangesAsync();
+// DELETE
+todoItems.MapDelete("/{id}", DeleteTodo);
 
-    return Results.NoContent();
-});
-
-app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
-{
-    if (await db.Todos.FindAsync(id) is Todo todo)
-    {
-        db.Todos.Remove(todo);
-        await db.SaveChangesAsync();
-        return Results.NoContent();
-    }
-    return Results.NotFound();
-});
+// ---------------------------------------
 
 app.Run();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApiDocument(config => {
-    config.DocumentName = "TodoAPI";
-    config.Title = "TodoAPI v1";
-    config.Version = "v1";
-});
+
+// ------------ ROUTE HANDLER METHODS ---------------
+
+// GET: /todoitems
+static Ok<IEnumerable<TodoItem>> GetAllTodos(TodoRepository repo)
+{
+    return TypedResults.Ok(repo.GetAll());
+}
+
+// GET: /todoitems/{id}
+static Results<Ok<TodoItem>, NotFound> GetTodoById(TodoRepository repo, int id)
+{
+    var item = repo.Get(id);
+
+    return item is not null
+        ? TypedResults.Ok(item)
+        : TypedResults.NotFound();
+}
+
+// POST: /todoitems
+static Created<TodoItem> CreateTodo(TodoRepository repo, TodoItem item)
+{
+    var created = repo.Add(item);
+
+    return TypedResults.Created($"/todoitems/{created.Id}", created);
+}
+
+// PUT: /todoitems/{id}
+static Results<NoContent, NotFound> UpdateTodo(TodoRepository repo, int id, TodoItem updated)
+{
+    var success = repo.Update(id, updated);
+
+    return success
+        ? TypedResults.NoContent()
+        : TypedResults.NotFound();
+}
+
+// DELETE: /todoitems/{id}
+static Results<NoContent, NotFound> DeleteTodo(TodoRepository repo, int id)
+{
+    var success = repo.Delete(id);
+
+    return success
+        ? TypedResults.NoContent()
+        : TypedResults.NotFound();
+}
